@@ -1,18 +1,19 @@
 package com.paymybuddy.repository;
 
+import com.paymybuddy.entity.User;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import com.paymybuddy.entity.Users;
 
 /**
  * Interface UserRepository pour accéder aux données des utilisateurs dans la base de données.
  * Hérite de JpaRepository pour bénéficier des opérations CRUD standard.
  */
 @Repository
-public interface UsersRepository extends JpaRepository<Users, Long> {
+public interface UserRepository extends JpaRepository<User, Long> {
 
     /**
      * Recherche un utilisateur par son adresse e-mail.
@@ -20,20 +21,16 @@ public interface UsersRepository extends JpaRepository<Users, Long> {
      * @param email L'adresse e-mail de l'utilisateur.
      * @return Un objet Optional contenant l'utilisateur s'il existe, sinon Optional vide.
      */
-    Optional<Users> findByEmail(String email);
+    Optional<User> findByEmail(String email);
 
     /**
-     * Recherche un utilisateur par son ID.
+     * Recherche un utilisateur par son username
      *
-     * @param id L'ID de l'utilisateur.
-     * @return Un objet Optional contenant l'utilisateur s'il existe, sinon Optional vide.
+     * @return La liste des toutes les connections d'un utilisateur et l'utilisateur
      */
-   
-    
-    
-    Optional<Users> findByUsername(String username);
+    Optional<User> findByUsername(String username);
 
 
- 
+
 
 }

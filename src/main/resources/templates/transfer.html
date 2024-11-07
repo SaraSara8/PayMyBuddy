@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Transférer de l'argent</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <style>
+        /* Incluez ici vos styles CSS existants */
+    </style>
+</head>
+<body>
+<!-- Navigation -->
+<header>
+    <div>Pay My Buddy</div>
+    <nav>
+        <a th:href="@{/transfer}" class="active">Transférer</a>
+        <a th:href="@{/profile}">Profil</a>
+        <a th:href="@{/addConnection}">Ajouter relation</a>
+        <a th:href="@{/connections}">Relations</a>
+        <a th:href="@{/logout}">Se déconnecter</a>
+    </nav>
+</header>
+
+
+<!-- Affichage du solde -->
+<div class="balance">
+    <p>Solde : <span th:text="${user.balance} + ' €'">0 €</span></p>
+</div>
+
+<!-- Affichage des messages -->
+<div th:if="${error}" class="error">
+    <p th:text="${error}"></p>
+</div>
+<div th:if="${success}" class="success">
+    <p th:text="${success}"></p>
+</div>
+
+<!-- Contenu principal -->
+<main>
+    <!-- Formulaire de transfert -->
+    <!-- Section Transférer -->
+    <div id="transferSection">
+        <div class="transfer-top">
+            <form th:action="@{/transactions/send}" method="post" class="transfer-form">
+                <select name="connectionEmail" required>
+                    <option value="" disabled selected>Sélectionner une relation</option>
+                    <option th:each="connection : ${user.connections}"
+                            th:value="${connection.email}"
+                            th:text="${connection.username}">
+                    </option>
+                </select>
+                <input type="text" name="description" placeholder="Description">
+                <input type="number" name="amount" min="0" step="1" placeholder="0 €" required>
+                <button type="submit">Payer</button>
+            </form>
+        </div>
+
+        <!-- Liste des transactions -->
+        <div class="transfer-bottom">
+            <table>
+                <thead>
+                <tr>
+                    <th>Relations</th>
+                    <th>Description</th>
+                    <th>Montant</th>
+                    <th>Type</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="transaction : ${transactions}">
+                    <td th:text="${transaction.receiver.username}"></td>
+                    <td th:text="${transaction.description}"></td>
+                    <td th:text="${transaction.amount} + ' €'"></td>
+                    <td th:class="${transaction.receiver.username} == ${user.username} ? 'transaction-received' : 'transaction-sent'">
+                        <span th:text="${transaction.receiver.username} == ${user.username} ? 'Reçu' : 'Émis'"></span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+</body>
+</html>

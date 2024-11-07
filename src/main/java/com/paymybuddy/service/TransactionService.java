@@ -1,28 +1,15 @@
 package com.paymybuddy.service;
 
-import java.util.List;
-
 import com.paymybuddy.entity.Transaction;
-import com.paymybuddy.entity.Users;
+import com.paymybuddy.entity.User;
+
+import java.util.List;
 
 public interface TransactionService {
 
-	
-	
-	/**
-     * Récupère la liste des transactions reçues par un utilisateur donné.
-     *
-     * @param receiver L'utilisateur qui a reçu les transactions.
-     * @return La liste des transactions reçues par l'utilisateur.
-     */
-    List<Transaction> findByReceiver(Users receiver);
-	
-	
-	/**
-     * Récupère la liste des transactions effectuées par un utilisateur donné.
-     *
-     * @param sender L'utilisateur qui a envoyé les transactions.
-     * @return La liste des transactions envoyées par l'utilisateur.
-     */
-    List<Transaction> findBySender(Users sender);
+    public Transaction sendMoney(User sender, User receiver, Double amount, String description) throws Exception;
+
+    public List<Transaction> findTransactionsForUser(User user);
+
+
 }

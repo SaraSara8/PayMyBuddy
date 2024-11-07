@@ -1,44 +1,48 @@
 package com.paymybuddy.config;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
+import com.paymybuddy.service.impl.CustomUserDetailsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-
-import com.paymybuddy.service.impl.UsersServiceImpl;
 
 /**
  * Configuration de la sécurité de l'application.
  * Cette classe configure les filtres de sécurité, les services d'authentification, et d'autres aspects liés à la sécurité.
  */
-@Configuration
-@EnableWebSecurity
+
+@Configuration  // Indique que cette classe contient des configurations Spring.
+@EnableWebSecurity  // Active la sécurité web de Spring Security.
 @EnableMethodSecurity // Active les annotations @PreAuthorize et similaires
 public class SecurityConfig {
 
-    private static final Logger logger = LogManager.getLogger(SecurityConfig.class);
 
- 
+    private final CustomUserDetailsService customUserDetailsService;
+    private final PasswordEncoder passwordEncoder;
+
+    public SecurityConfig(CustomUserDetailsService customUserDetailsService, PasswordEncoder passwordEncoder) {
+        this.customUserDetailsService = customUserDetailsService;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
+
     /**
      * Configure le filtre de sécurité de Spring Security.
      *
      * @param http L'objet HttpSecurity pour configurer la sécurité des requêtes HTTP.
-     * @param userDetailsService Le service de gestion des utilisateurs utilisé pour l'authentification.
      * @return Un SecurityFilterChain configuré pour sécuriser les requêtes HTTP.
      * @throws Exception En cas d'erreur de configuration.
      */
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, UserDetailsService userDetailsService) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         logger.info("Configuration du filtre de sécurité");
 
         http
@@ -46,11 +50,11 @@ public class SecurityConfig {
                     logger.info("Désactivation de CSRF");
                     csrf.disable();
                 }) // Désactiver CSRF si nécessaire
-                .authorizeHttpRequests(authorize -> {
+                .authorizeHttpRequests(authorize -> {   //Définit les règles d'autorisation pour les requêtes HTTP
                     logger.info("Configuration des autorisations de requêtes HTTP");
                     authorize
-                            .requestMatchers("/register", "/login", "/css/**", "/js/**").permitAll()
-                            .anyRequest().authenticated();
+                            .requestMatchers("/register", "/login", "/css/**", "/js/**").permitAll() // et les ressources statiques sont accessibles à tous
+                            .anyRequest().authenticated(); // Toutes les autres requêtes (anyRequest()) nécessitent une authentification
                 })
                 .formLogin(form -> {
                     logger.info("Configuration de la page de connexion");
@@ -66,33 +70,20 @@ public class SecurityConfig {
                             .invalidateHttpSession(true) // Invalide la session
                             .deleteCookies("JSESSIONID") // Supprime les cookies de session
                             .permitAll();
-                })
-                .userDetailsService(userDetailsService); // Utiliser le userService injecté
+                });
 
         logger.info("Filtre de sécurité configuré avec succès");
         return http.build();
     }
 
-    /**
-     * Fournit un UserDetailsService à partir du UserService.
-     *
-     * @param userService Le service utilisateur à utiliser pour les détails d'authentification.
-     * @return Un UserDetailsService basé sur le UserService fourni.
-     */
+
+
+
     @Bean
-    public UserDetailsService userDetailsService(UsersServiceImpl userService) {
-        logger.info("Création du bean UserDetailsService à partir de UserService");
-        return userService;
+    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
+        AuthenticationManagerBuilder auth = http.getSharedObject(AuthenticationManagerBuilder.class);
+        auth.userDetailsService(customUserDetailsService).passwordEncoder(passwordEncoder);
+        return auth.build();
     }
 
-    /**
-     * Fournit un encodeur de mots de passe utilisant BCrypt.
-     *
-     * @return Un PasswordEncoder utilisant BCrypt.
-     */
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        logger.info("Création du bean PasswordEncoder utilisant BCryptPasswordEncoder");
-        return new BCryptPasswordEncoder();
-    }
 }
