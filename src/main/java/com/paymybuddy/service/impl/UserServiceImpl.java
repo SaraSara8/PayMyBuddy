@@ -4,6 +4,7 @@ import com.paymybuddy.entity.User;
 import com.paymybuddy.repository.UserRepository;
 import com.paymybuddy.service.UserService;
 
+import jakarta.transaction.Transactional;
 import lombok.Data;
 
 
@@ -92,6 +93,7 @@ public class UserServiceImpl implements UserService {
      * @param user L'utilisateur à enregistrer.
      * @return L'utilisateur enregistré.
      */
+    @Transactional
     @Override
     public User registerUser(User user) {
         // Encodez le mot dae passe avant de le sauvegarder
@@ -110,6 +112,7 @@ public class UserServiceImpl implements UserService {
      *
      * @param user L'utilisateur à mettre à jour.
      */
+    @Transactional
     @Override
     public void updateUser(User user) {
         logger.info("Mise à jour des informations de l'utilisateur: {}", user.getEmail());
@@ -123,6 +126,7 @@ public class UserServiceImpl implements UserService {
      * @param user       L'utilisateur ajoutant une connexion.
      * @param connection L'utilisateur à ajouter comme connexion.
      */
+    @Transactional
     @Override
     public void addConnection(User user, User connection) {
         logger.info("Ajout d'une connexion pour l'utilisateur: {}", user.getEmail());
@@ -143,6 +147,7 @@ public class UserServiceImpl implements UserService {
      * @param user        L'utilisateur dont le mot de passe doit être mis à jour.
      * @param newPassword Le nouveau mot de passe.
      */
+    @Transactional
     @Override
     public void updatePassword(User user, String newPassword) {
         logger.info("Mise à jour du mot de passe pour l'utilisateur: {}", user.getEmail());

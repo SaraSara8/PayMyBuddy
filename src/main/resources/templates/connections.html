@@ -37,12 +37,14 @@
             <table>
                 <thead>
                 <tr>
-                    <th>Relations</th>
+                    <th>Username</th>
+                    <th>email</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="connection : ${user.connections}">
                     <td th:text="${connection.username}"></td>
+                    <td th:text="${connection.email}"></td>
                  </tr>
                 </tbody>
             </table>

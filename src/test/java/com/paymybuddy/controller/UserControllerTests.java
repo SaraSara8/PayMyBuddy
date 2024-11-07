@@ -199,4 +199,17 @@ public class UserControllerTests {
                 .andExpect(model().attribute("error", "Cette relation existe déjà."));
     }
 
+    /**
+     * Teste l'affichage du formulaire des relations.
+     */
+    @Test
+    public void testShowConnectionsForm() throws Exception {
+        mockMvc.perform(get("/connections")
+                        .principal(() -> "user1@example.com")) // Simule l'utilisateur connecté
+                .andExpect(status().isOk())
+                .andExpect(view().name("connections"))
+                .andExpect(model().attributeExists("user"));
+    }
+
+
 }
